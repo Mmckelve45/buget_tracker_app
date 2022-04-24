@@ -1,3 +1,4 @@
+import 'package:buget_tracker_app/screens/deals.dart';
 import 'package:buget_tracker_app/screens/home.dart';
 import 'package:buget_tracker_app/services/budget_service.dart';
 import 'package:buget_tracker_app/services/theme_service.dart';
@@ -35,15 +36,22 @@ class MyApp extends StatelessWidget {
 
             return MaterialApp(
               title: 'Flutter Demo',
+              debugShowCheckedModeBanner: false,
               theme: ThemeData(
                   colorScheme: ColorScheme.fromSeed(
                       seedColor: Colors.indigo,
                       brightness: themeService.darkTheme
                           ? Brightness.dark
                           : Brightness.light)),
-              home: const Home(
-                title: "Budget Tracker",
-              ),
+              initialRoute: '/',
+              routes: {
+                '/':(context) => Home(title: "Budget Tracker",),
+                '/deals':(context) => DealScreen(),
+                // '/search':(context) => SearchCoupons())
+              }
+              // home: const Home(
+              //   title: "Budget Tracker",
+              // ),
             );
           },
         ));

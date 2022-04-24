@@ -25,6 +25,9 @@ class BudgetService extends ChangeNotifier {
 
   void updateBalance(TransactionItem item) {
     if (item.isExpense) {
+      // if (balance + item.amount > budget) {
+      //   balance = budget;
+      // }
       balance += item.amount;
     } else {
       balance -= item.amount;

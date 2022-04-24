@@ -1,9 +1,16 @@
+import 'dart:convert';
+
+import 'package:buget_tracker_app/model/deal_model.dart';
 import 'package:buget_tracker_app/model/transaction_item.dart';
+import 'package:buget_tracker_app/screens/deals.dart';
 import 'package:buget_tracker_app/services/budget_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'dart:async';
+import 'dart:convert';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -25,10 +32,20 @@ class HomePage extends StatelessWidget {
                       alignment: Alignment.topCenter,
                       child: Consumer<BudgetService>(
                         builder: ((context, value, child) {
+                          double percentTracker = value.balance / value.budget;
+                          if (value.balance > value.budget) {
+                            percentTracker = 1;
+                          }
+                          double radiusVar;
+                          screenSize.width > 600
+                              ? radiusVar = screenSize.width / 4
+                              : radiusVar = screenSize.width / 2;
+                          print(screenSize.width);
                           return CircularPercentIndicator(
-                            radius: screenSize.width / 2,
+                            // radius: screenSize.width / 4,
+                            radius: radiusVar,
                             lineWidth: 10.0,
-                            percent: value.balance / value.budget,
+                            percent: percentTracker,
                             backgroundColor: Colors.white,
                             center: Column(
                               mainAxisSize: MainAxisSize.min,
@@ -66,9 +83,8 @@ class HomePage extends StatelessWidget {
                     const SizedBox(
                       height: 10,
                     ),
-                    Consumer<BudgetService>(
-                      builder: ((context, value, child) {
-                        return ListView.builder(
+                    Consumer<BudgetService>(builder: ((context, value, child) {
+                      return ListView.builder(
                           shrinkWrap: true,
                           itemCount: value.items.length,
                           physics: const ClampingScrollPhysics(),
@@ -76,24 +92,8 @@ class HomePage extends StatelessWidget {
                             return TransactionCard(
                               transactionItem: value.items[index],
                             );
-                          }
-                        );
-                      })
-                    ),
-                    // ...List.generate(
-                    //   items.length,
-                    //   (index) => TransactionCard(transactionItem: items[index]),
-                    // ),
-                    // TransactionCard(
-                    //   transactionItem: TransactionItem(
-                    //       itemTitle: "Apple Watch", amount: 105.99),
-                    // ),
-                    // TransactionCard(
-                    //   transactionItem: TransactionItem(
-                    //       itemTitle: "Apple iPhone",
-                    //       amount: 800,
-                    //       isExpense: false),
-                    // )
+                          });
+                    })),
                   ],
                 ),
               ))),
@@ -120,6 +120,34 @@ class TransactionCard extends StatelessWidget {
   // final bool isExpense;
 
   TransactionCard({required this.transactionItem, Key? key}) : super(key: key);
+
+  //https://www.codegrepper.com/code-examples/whatever/how+to+fetch+data+from+api+in+localhost+using+flutter
+  // good way to keep the json in a list and parse through it.
+
+  fetchData(query) async {
+    final res = await http.get(
+        Uri.parse("http://192.168.0.13:5000/deals/$query"),
+        headers: {"Access-Control-Allow-Origin": "*"});
+    // final response = await http
+    //     .get(Uri.parse("https://api.discountapi.com/v2/deals?query=mousepad"));
+    if (res.statusCode == 200) {
+      List<Deal> retList = [];
+      // title, description, price, value, discount_amount, url, image_url
+      List getList = json.decode(res.body);
+      for (int i = 0; i < getList.length; i++) {
+        retList.add(Deal.fromJson(getList[i]));
+        // print(getList[i]['price']);
+      }
+      print(retList[0].price);
+      // print(res.body);
+      // var v = json.decode(res.body);
+      // print(v[0]['title']);
+      return retList;
+      // return jsonDecode(response.body);
+    } else {
+      throw Exception('failed to load');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -153,6 +181,25 @@ class TransactionCard extends StatelessWidget {
                   transactionItem.amount.toString(),
               style: const TextStyle(fontSize: 16),
             ),
+            SizedBox(
+              width: 15,
+            ),
+            Container(
+              decoration:
+                  BoxDecoration(border: Border.all(color: Colors.white)),
+              child: TextButton(
+                  onPressed: () async {
+                    var dealList = await fetchData(transactionItem.itemTitle)
+                        as List<Deal>;
+                    // Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //         builder: (_) => DealScreen(dealList: dealList)));
+                    Navigator.of(context)
+                        .pushNamed('/deals', arguments: {'dealList': dealList});
+                  },
+                  child: Text("Get Deals!")),
+            )
           ],
         ),
       ),
