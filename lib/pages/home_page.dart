@@ -97,7 +97,9 @@ class HomePage extends StatelessWidget {
                   ],
                 ),
               ))),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
+        label: Text('Add Income/Expense...'),
+        icon: Icon(Icons.add),
         onPressed: () {
           showDialog(
               context: context,
@@ -108,7 +110,7 @@ class HomePage extends StatelessWidget {
                 });
               });
         },
-        child: const Icon(Icons.add),
+        // child: const Icon(Icons.add),
       ),
     );
   }
@@ -196,7 +198,7 @@ class TransactionCard extends StatelessWidget {
                     //     MaterialPageRoute(
                     //         builder: (_) => DealScreen(dealList: dealList)));
                     Navigator.of(context)
-                        .pushNamed('/deals', arguments: {'dealList': dealList});
+                        .pushNamed('/deals', arguments: {'dealList': dealList, 'item': transactionItem.itemTitle});
                   },
                   child: Text("Get Deals!")),
             )

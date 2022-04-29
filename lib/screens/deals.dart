@@ -1,12 +1,17 @@
-import 'dart:ui';
+// import 'dart:convert';
+// import 'dart:ui';
+
+import 'dart:convert';
 
 import 'package:buget_tracker_app/model/deal_model.dart';
+import 'package:buget_tracker_app/model/sentiment_model.dart';
 import 'package:buget_tracker_app/responsive.dart';
 import 'package:buget_tracker_app/services/theme_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
 
 class DealScreen extends StatelessWidget {
   // final List<Deal> dealList;
@@ -16,10 +21,12 @@ class DealScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Map arguments = ModalRoute.of(context)?.settings.arguments as Map;
-    List<Deal>dealList = arguments['dealList'];
+    List<Deal> dealList = arguments['dealList'];
+    String dealItem = arguments['item'];
     return Scaffold(
       appBar: AppBar(
-        title: Text('Deals'),
+        centerTitle: true,
+        title: Text('Deals for ' + dealItem),
       ),
       body: SafeArea(
         child: SizedBox(
@@ -33,8 +40,8 @@ class DealScreen extends StatelessWidget {
                   children: [
                     // SizedBox(height: 10,),
                     Responsive(
-                      mobile:
-                          mobileListBuilder(MediaQuery.of(context).size.height, dealList),
+                      mobile: mobileListBuilder(
+                          MediaQuery.of(context).size.height, dealList),
                       tablet: mobileListBuilder(450, dealList),
                       desktop: desktopBuilder(dealList),
                     ),
@@ -87,7 +94,27 @@ class DealScreen extends StatelessWidget {
 
 class DealCard extends StatelessWidget {
   final Deal deal;
-  const DealCard({Key? key, required this.deal}) : super(key: key);
+  DealCard({Key? key, required this.deal}) : super(key: key);
+
+  fetchData1(query) async {
+    final res = await http.get(
+        Uri.parse("http://192.168.0.13:5000/sentiment/$query"),
+        headers: {"Access-Control-Allow-Origin": "*"});
+    if (res.statusCode == 200) {
+      // List<Deal> retList = [];
+      // title, description, price, value, discount_amount, url, image_url
+      var jsonReturn = json.decode(res.body);
+      print(jsonReturn);
+      Sentiment sentiment = Sentiment.fromJson(jsonReturn);
+      return sentiment;
+      // return jsonDecode(response.body);
+    } else {
+      // Dialog(
+      //   child: Text('Could not find sentiment'),
+      // );
+      throw Exception('failed to load');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -128,7 +155,27 @@ class DealCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Header(themeStyle, 'Title: '),
+              Row(
+                children: [
+                  Header(themeStyle, 'Title: '),
+                  Spacer(),
+                  Container(
+                    // padding: EdgeInsets.only(right: 10),
+                    decoration:
+                        BoxDecoration(border: Border.all(color: Colors.white)),
+                    child: TextButton(
+                        onPressed: () async {
+                          var sentiment = await fetchData1(deal.title);
+                          await showModalBottomSheet(
+                              context: context,
+                              builder: (context) =>
+                                  SentimentBottomSheet(sentiment: sentiment));
+                        },
+                        child: Text("Show Sentiment")),
+                  ),
+                ],
+              ),
+              // Header(themeStyle, 'Title: '),
               Text(
                 deal.title,
                 style: TextStyle(fontSize: 18),
@@ -190,3 +237,123 @@ Widget Header(themeStyle, label) {
             fontWeight: FontWeight.bold),
   );
 }
+
+class SentimentBottomSheet extends StatefulWidget {
+  const SentimentBottomSheet({Key? key, required this.sentiment})
+      : super(key: key);
+  final Sentiment sentiment;
+
+  @override
+  State<SentimentBottomSheet> createState() => _SentimentBottomSheetState();
+}
+
+class _SentimentBottomSheetState extends State<SentimentBottomSheet> {
+  // String? comment = '';
+  // TextEditingController commentsTEC = TextEditingController();
+  // bool anonymous = false;
+
+  @override
+  Widget build(BuildContext context) {
+    double positiveSent = widget.sentiment.compound * 100;
+
+    if (positiveSent == 50) {}
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Sentiment Analysis",
+                      style: TextStyle(fontSize: 48),
+                    )
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SentimentContainer('Negative', Colors.red[300]),
+                    SentimentContainer(
+                        widget.sentiment.negative.toString(), Colors.red[300])
+                    // Text("Negative: "),
+                    // Spacer(),
+                    // Text(widget.sentiment.negative.toString()),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SentimentContainer('Neutral', Colors.blueGrey[600]),
+                    SentimentContainer(widget.sentiment.neutral.toString(),
+                        Colors.blueGrey[600])
+                    // Text("Neutral: "),
+                    // Spacer(),
+                    // Text(widget.sentiment.neutral.toString()),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SentimentContainer('Positive', Colors.greenAccent),
+                    SentimentContainer(widget.sentiment.positive.toString(),
+                        Colors.greenAccent)
+                    // Text("Positive: "),
+                    // Spacer(),
+                    // Text(widget.sentiment.positive.toString()),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SentimentContainer(
+                        "Overall Sentiment is: " +
+                            positiveSent.toString() +
+                            '% positive!',
+                        positiveSent > 50
+                            ? Colors.greenAccent
+                            : positiveSent < 50
+                                ? Colors.red[300]
+                                : Colors.blueGrey)
+                    // Text("Overall Sentiment is: " +
+                    //     positiveSent.toString() +
+                    //     '% positive!'),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+Widget SentimentContainer(text, color) {
+  return Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: Container(
+      decoration: BoxDecoration(border: Border.all(), color: color),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(text, style: TextStyle(fontSize: 32)),
+      ),
+    ),
+  );
+}
+
+// Widget CalcColor(sentimentScore) {
+//   if (sentimentScore > 50) {
+//     return Colors.blueGrey;
+//   } else if (sentimentScore > 50) {
+//     return Colors.greenAccent;
+//   } else {
+//     return Colors.red;
+//   }
+// }

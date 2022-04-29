@@ -44,18 +44,25 @@ class _HomeState extends State<Home> {
         title: Text(widget.title),
         centerTitle: true,
         actions: [
-          IconButton(
-            onPressed: () {
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return AddBudgetDialog(budgetToAdd: (budget) {
-                      final budgetService = context.read<BudgetService>();
-                      budgetService.budget = budget;
-                    });
-                  });
-            },
-            icon: const Icon(Icons.attach_money),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              decoration: BoxDecoration(border: Border.all(color: Colors.white, width: 1),),
+              child: TextButton(
+                child: Text('Change Budget!', style: TextStyle(color: Colors.white),),
+                onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AddBudgetDialog(budgetToAdd: (budget) {
+                          final budgetService = context.read<BudgetService>();
+                          budgetService.budget = budget;
+                        });
+                      });
+                },
+                // icon: const Icon(Icons.attach_money),
+              ),
+            ),
           )
         ],
       ),
