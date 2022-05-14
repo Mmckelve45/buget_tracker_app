@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final sharedPreferences = await SharedPreferences.getInstance();
+  
   runApp(MyApp(
     sharedPreferences: sharedPreferences,
   ));
@@ -35,7 +36,7 @@ class MyApp extends StatelessWidget {
             // final themeService = Provider.of<ThemeService>(context);
 
             return MaterialApp(
-              title: 'Flutter Demo',
+              title: 'Budget Tracker',
               debugShowCheckedModeBanner: false,
               theme: ThemeData(
                   colorScheme: ColorScheme.fromSeed(

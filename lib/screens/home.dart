@@ -44,6 +44,7 @@ class _HomeState extends State<Home> {
         title: Text(widget.title),
         centerTitle: true,
         actions: [
+          // Text("test"),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
@@ -63,7 +64,8 @@ class _HomeState extends State<Home> {
                 // icon: const Icon(Icons.attach_money),
               ),
             ),
-          )
+          ),
+         
         ],
       ),
       body: pages[_currentPageIndex],

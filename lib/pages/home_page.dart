@@ -128,7 +128,8 @@ class TransactionCard extends StatelessWidget {
 
   fetchData(query) async {
     final res = await http.get(
-        Uri.parse("http://192.168.0.13:5000/deals/$query"),
+        Uri.parse("https://projectmicroservices-7uy7oyn5ia-uc.a.run.app/deals/$query"),
+        // Uri.parse("http://192.168.0.13:5000/deals/$query"),
         headers: {"Access-Control-Allow-Origin": "*"});
     // final response = await http
     //     .get(Uri.parse("https://api.discountapi.com/v2/deals?query=mousepad"));

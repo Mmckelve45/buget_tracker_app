@@ -2,21 +2,53 @@
 // import 'dart:ui';
 
 import 'dart:convert';
+// import 'dart:io';
 
 import 'package:buget_tracker_app/model/deal_model.dart';
 import 'package:buget_tracker_app/model/sentiment_model.dart';
 import 'package:buget_tracker_app/responsive.dart';
 import 'package:buget_tracker_app/services/theme_service.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
+import 'dart:html' as webFile;
+// import 'package:file_picker_web/file_picker_web.dart' as webPicker;
+
+// import 'dart.io';
 
 class DealScreen extends StatelessWidget {
   // final List<Deal> dealList;
   // const DealScreen({Key? key, required this.dealList}) : super(key: key);
   const DealScreen({Key? key}) : super(key: key);
+
+  writeContent(String text) async {
+    if (kIsWeb) {
+      // loop the object and concatenate with \n in it to produce a string
+      // have one result string
+
+      var blob = webFile.Blob(['test\n65 5 20'], 'text/plain', 'native');
+
+      var anchorElement = webFile.AnchorElement(
+        href: webFile.Url.createObjectUrlFromBlob(blob).toString(),
+      )
+        ..setAttribute('download', 'contents.txt')
+        ..click();
+    }
+    if (kIsWeb) {
+      var blob = webFile.Blob(['SAVE savefile.txt'], 'text/plain', 'native');
+
+      var anchorElement = webFile.AnchorElement(
+        href: webFile.Url.createObjectUrlFromBlob(blob).toString(),
+      )
+        ..setAttribute('download', 'command.txt')
+        ..click();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +59,27 @@ class DealScreen extends StatelessWidget {
       appBar: AppBar(
         centerTitle: true,
         title: Text('Deals for ' + dealItem),
+        actions: [
+          // Text("test"),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.white, width: 1),
+              ),
+              child: TextButton(
+                  child: Text(
+                    'Export',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: () {
+                    writeContent("Test");
+                  }
+                  // icon: const Icon(Icons.attach_money),
+                  ),
+            ),
+          ),
+        ],
       ),
       body: SafeArea(
         child: SizedBox(
@@ -98,7 +151,9 @@ class DealCard extends StatelessWidget {
 
   fetchData1(query) async {
     final res = await http.get(
-        Uri.parse("http://192.168.0.13:5000/sentiment/$query"),
+        Uri.parse(
+            "https://projectmicroservices-7uy7oyn5ia-uc.a.run.app/sentiment/$query"),
+        // Uri.parse("http://192.168.0.13:5000/sentiment/$query"),
         headers: {"Access-Control-Allow-Origin": "*"});
     if (res.statusCode == 200) {
       // List<Deal> retList = [];
