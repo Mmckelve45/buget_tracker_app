@@ -8,15 +8,14 @@ import 'package:buget_tracker_app/model/deal_model.dart';
 import 'package:buget_tracker_app/model/sentiment_model.dart';
 import 'package:buget_tracker_app/responsive.dart';
 import 'package:buget_tracker_app/services/theme_service.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
 import 'dart:html' as webFile;
+
 // import 'package:file_picker_web/file_picker_web.dart' as webPicker;
 
 // import 'dart.io';
@@ -26,12 +25,23 @@ class DealScreen extends StatelessWidget {
   // const DealScreen({Key? key, required this.dealList}) : super(key: key);
   const DealScreen({Key? key}) : super(key: key);
 
-  writeContent(String text) async {
+  writeContent(List<Deal> dealList) async {
     if (kIsWeb) {
       // loop the object and concatenate with \n in it to produce a string
       // have one result string
+      // String? resultString;
+      var resultString = StringBuffer();
+      for (var i = 0; i < dealList.length; i++) {
+        resultString.writeln(dealList[i].title);
+        // resultString.writeln('\n');
+        resultString.writeln('Value:\$' + dealList[i].value.toString() + 
+                            ' Discount:\$' + dealList[i].discountAmount.toString() + 
+                            ' Price:\$' + dealList[i].price.toString()
+                            );
 
-      var blob = webFile.Blob(['test\n65 5 20'], 'text/plain', 'native');
+      }
+
+      var blob = webFile.Blob([resultString], 'text/plain', 'native');
 
       var anchorElement = webFile.AnchorElement(
         href: webFile.Url.createObjectUrlFromBlob(blob).toString(),
@@ -73,7 +83,7 @@ class DealScreen extends StatelessWidget {
                     style: TextStyle(color: Colors.white),
                   ),
                   onPressed: () {
-                    writeContent("Test");
+                    writeContent(dealList);
                   }
                   // icon: const Icon(Icons.attach_money),
                   ),
@@ -99,15 +109,6 @@ class DealScreen extends StatelessWidget {
                       desktop: desktopBuilder(dealList),
                     ),
                   ]),
-              // child: ListView.builder(
-              //     shrinkWrap: true,
-              //     itemCount: dealList.length,
-              //     physics: const ClampingScrollPhysics(),
-              //     itemBuilder: (context, index) {
-              //       return DealCard(
-              //         deal: dealList[index],
-              //       );
-              //     }),
             ),
           ),
         ),

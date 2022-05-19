@@ -1,28 +1,42 @@
 import time
 import os.path
+import sys
+
+from pip import main
 
 # Commands that the command text file can have 
 commands = ['SAVE', 'LOAD']
 
+# to run
+# C:\Users\Matthew McKelvey\Documents\flutterProjects\budgetTrackerApp\buget_tracker_app\lib>python ./microservice/save.py "C:/Users/Matthew McKelvey/Downloads/"
+
+if len(sys.argv) != 2:
+    # print(sys.argv)
+    print("Arguments are invalid only enter the filepath to the directory")
+    exit()
+ 
+# This should be something like "C:/Users/name/Downloads/"
+location = str(sys.argv[1])
+location += '\\'
+
 # Object that will hold the save data 
 class Deal:
-    def __init__(self, title, value, discount, priceAfter):
+    def __init__(self, title, value, discount, priceAfter=None):
         self.title = title
         self.value = value 
         self.discount = discount
         self.priceAfter = priceAfter
 
 # The save function 
-def Save(filename):
+
+# Add content file
+def Save(savefile, contentFile):
     # Open the files 
-    # contents = open('./lib/microservice/contents.txt', 'r+')
-    contents = open('C:/Users/Matthew McKelvey/Downloads/contents.txt', 'r+')
+    contents = open(contentFile, 'r+')
     # "C:\Users\Matthew McKelvey\Downloads\Checking_Checking_Transactions_20220513-175611.CSV"
-    savefile = open(filename, 'r+')
+    savefile = open(savefile, 'r+')
     # Hold the save data in a struct 
     deals = []
-    
-    
 
     # Loop through the contents assigning data to struct then appending list
     while(True):
@@ -52,15 +66,18 @@ def Save(filename):
     contents.close()
     savefile.close()
 
-def Load(filename):
+def Load(savefile, contentsfile):
     # Open the files 
     # contents = open('./lib/microservice/contents.txt', 'r+')
-    while not os.path.exists('C:/Users/Matthew McKelvey/Downloads/contents.txt'):
+    # while not os.path.exists('C:/Users/Matthew McKelvey/Downloads/contents.txt'):
+    while not os.path.exists(contentsfile):
         time.sleep(1)
     
-    if os.path.isfile('C:/Users/Matthew McKelvey/Downloads/contents.txt'):
-        contents = open('C:/Users/Matthew McKelvey/Downloads/contents.txt', 'r+')
-        savefile = open(filename, 'r+')
+    # if os.path.isfile('C:/Users/Matthew McKelvey/Downloads/contents.txt'):
+    if os.path.isfile(contentsfile):
+        # contents = open('C:/Users/Matthew McKelvey/Downloads/contents.txt', 'r+')
+        contents = open(contentsfile, 'r+')
+        savefile = open(savefile, 'r+')
     # Hold the save data in a struct 
     deals = []
 
@@ -98,14 +115,13 @@ def Load(filename):
 print("Running Save System!...")
 
 # Loop infinite 
+
 while(True):
     time.sleep(1)
-    # File descriptor 
-    # f = open("./lib/microservice/command.txt", 'r+')
-    while not os.path.exists('C:/Users/Matthew McKelvey/Downloads/command.txt'):
+    while not os.path.exists(location + 'command.txt'):
         time.sleep(1)
-    if os.path.isfile('C:/Users/Matthew McKelvey/Downloads/command.txt'):    
-        f = open('C:/Users/Matthew McKelvey/Downloads/command.txt', 'r+')
+    if os.path.isfile(location + 'command.txt'):    
+        f = open(location + 'command.txt', 'r+')
     # Read the first line of the command text  
     x = f.readline().strip('\n')
     # If empty just relax for a moment 
@@ -117,9 +133,9 @@ while(True):
     cmd = x.split()
     # Carry out the task 
     if(cmd[0] == commands[0]):
-        Save("./lib/microservice/" + cmd[1])
+        Save(location + cmd[1], location + 'contents.txt')
     elif(cmd[0] == commands[1]):
-        Load("./lib/microservice/" + cmd[1]) 
+        Load(location + cmd[1], location + 'contents.txt') 
     else:
         print("Uhh something went wrong with the commands!")   
         exit()
@@ -127,4 +143,3 @@ while(True):
     f.seek(0)
     f.truncate()
     f.write("DONE")
-
