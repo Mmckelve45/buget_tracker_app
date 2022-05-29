@@ -1,4 +1,3 @@
-// title, description, price, value, discount_amount, url, image_url
 class Deal {
   final String title;
   final String description;

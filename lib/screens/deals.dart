@@ -2,7 +2,6 @@
 // import 'dart:ui';
 
 import 'dart:convert';
-// import 'dart:io';
 
 import 'package:buget_tracker_app/model/deal_model.dart';
 import 'package:buget_tracker_app/model/sentiment_model.dart';
@@ -12,24 +11,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
-import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:html' as webFile;
 
-// import 'package:file_picker_web/file_picker_web.dart' as webPicker;
 
-// import 'dart.io';
 
 class DealScreen extends StatelessWidget {
-  // final List<Deal> dealList;
-  // const DealScreen({Key? key, required this.dealList}) : super(key: key);
   const DealScreen({Key? key}) : super(key: key);
 
   writeContent(List<Deal> dealList) async {
     if (kIsWeb) {
       // loop the object and concatenate with \n in it to produce a string
-      // have one result string
-      // String? resultString;
       var resultString = StringBuffer();
       for (var i = 0; i < dealList.length; i++) {
         resultString.writeln(dealList[i].title);
@@ -85,7 +77,6 @@ class DealScreen extends StatelessWidget {
                   onPressed: () {
                     writeContent(dealList);
                   }
-                  // icon: const Icon(Icons.attach_money),
                   ),
             ),
           ),
@@ -101,7 +92,6 @@ class DealScreen extends StatelessWidget {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // SizedBox(height: 10,),
                     Responsive(
                       mobile: mobileListBuilder(
                           MediaQuery.of(context).size.height, dealList),
@@ -154,28 +144,20 @@ class DealCard extends StatelessWidget {
     final res = await http.get(
         Uri.parse(
             "https://projectmicroservices-7uy7oyn5ia-uc.a.run.app/sentiment/$query"),
-        // Uri.parse("http://192.168.0.13:5000/sentiment/$query"),
         headers: {"Access-Control-Allow-Origin": "*"});
     if (res.statusCode == 200) {
-      // List<Deal> retList = [];
       // title, description, price, value, discount_amount, url, image_url
       var jsonReturn = json.decode(res.body);
       print(jsonReturn);
       Sentiment sentiment = Sentiment.fromJson(jsonReturn);
       return sentiment;
-      // return jsonDecode(response.body);
     } else {
-      // Dialog(
-      //   child: Text('Could not find sentiment'),
-      // );
       throw Exception('failed to load');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // DateTime timestamp = DateTime.parse(deal.expiresAt);
-    // print(timestamp);
     var themeStyle = true;
     context.read<ThemeService>().darkTheme == true
         ? themeStyle = true
@@ -216,7 +198,6 @@ class DealCard extends StatelessWidget {
                   Header(themeStyle, 'Title: '),
                   Spacer(),
                   Container(
-                    // padding: EdgeInsets.only(right: 10),
                     decoration:
                         BoxDecoration(border: Border.all(color: Colors.white)),
                     child: TextButton(
@@ -231,7 +212,6 @@ class DealCard extends StatelessWidget {
                   ),
                 ],
               ),
-              // Header(themeStyle, 'Title: '),
               Text(
                 deal.title,
                 style: TextStyle(fontSize: 18),
@@ -262,7 +242,6 @@ class DealCard extends StatelessWidget {
               ),
               Header(themeStyle, 'Expires: '),
               Text(
-                // timestamp.toString(),
                 deal.expiresAt,
               ),
               Header(themeStyle, 'URL: '),
@@ -304,9 +283,6 @@ class SentimentBottomSheet extends StatefulWidget {
 }
 
 class _SentimentBottomSheetState extends State<SentimentBottomSheet> {
-  // String? comment = '';
-  // TextEditingController commentsTEC = TextEditingController();
-  // bool anonymous = false;
 
   @override
   Widget build(BuildContext context) {
@@ -338,9 +314,6 @@ class _SentimentBottomSheetState extends State<SentimentBottomSheet> {
                     SentimentContainer('Negative', Colors.red[300]),
                     SentimentContainer(
                         widget.sentiment.negative.toString(), Colors.red[300])
-                    // Text("Negative: "),
-                    // Spacer(),
-                    // Text(widget.sentiment.negative.toString()),
                   ],
                 ),
                 Row(
@@ -349,9 +322,6 @@ class _SentimentBottomSheetState extends State<SentimentBottomSheet> {
                     SentimentContainer('Neutral', Colors.blueGrey[600]),
                     SentimentContainer(widget.sentiment.neutral.toString(),
                         Colors.blueGrey[600])
-                    // Text("Neutral: "),
-                    // Spacer(),
-                    // Text(widget.sentiment.neutral.toString()),
                   ],
                 ),
                 Row(
@@ -360,9 +330,6 @@ class _SentimentBottomSheetState extends State<SentimentBottomSheet> {
                     SentimentContainer('Positive', Colors.greenAccent),
                     SentimentContainer(widget.sentiment.positive.toString(),
                         Colors.greenAccent)
-                    // Text("Positive: "),
-                    // Spacer(),
-                    // Text(widget.sentiment.positive.toString()),
                   ],
                 ),
                 Row(
@@ -377,9 +344,6 @@ class _SentimentBottomSheetState extends State<SentimentBottomSheet> {
                             : positiveSent < 50
                                 ? Colors.red[300]
                                 : Colors.blueGrey)
-                    // Text("Overall Sentiment is: " +
-                    //     positiveSent.toString() +
-                    //     '% positive!'),
                   ],
                 ),
               ],

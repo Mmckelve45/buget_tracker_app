@@ -19,7 +19,6 @@ class MyApp extends StatelessWidget {
   final SharedPreferences sharedPreferences;
   const MyApp({required this.sharedPreferences, Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -32,8 +31,8 @@ class MyApp extends StatelessWidget {
             final themeService = context.watch<ThemeService>();
             // listen = true here would be context.watch
 
-            //default of provider is listen = true so you would need to deliberately set it false.
-            // final themeService = Provider.of<ThemeService>(context);
+            // default of provider is listen = true so you would need to deliberately set it false.
+            // final themeService = Provider.of<ThemeService>(context);  < alternative method to write this
 
             return MaterialApp(
               title: 'Budget Tracker',
@@ -48,11 +47,8 @@ class MyApp extends StatelessWidget {
               routes: {
                 '/':(context) => Home(title: "Budget Tracker",),
                 '/deals':(context) => DealScreen(),
-                // '/search':(context) => SearchCoupons())
               }
-              // home: const Home(
-              //   title: "Budget Tracker",
-              // ),
+
             );
           },
         ));

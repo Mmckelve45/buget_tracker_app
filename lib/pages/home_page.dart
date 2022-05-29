@@ -2,15 +2,12 @@ import 'dart:convert';
 
 import 'package:buget_tracker_app/model/deal_model.dart';
 import 'package:buget_tracker_app/model/transaction_item.dart';
-import 'package:buget_tracker_app/screens/deals.dart';
 import 'package:buget_tracker_app/services/budget_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
-import 'dart:async';
-import 'dart:convert';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -118,8 +115,6 @@ class HomePage extends StatelessWidget {
 
 class TransactionCard extends StatelessWidget {
   final TransactionItem transactionItem;
-  // final double amount;
-  // final bool isExpense;
 
   TransactionCard({required this.transactionItem, Key? key}) : super(key: key);
 
@@ -129,24 +124,14 @@ class TransactionCard extends StatelessWidget {
   fetchData(query) async {
     final res = await http.get(
         Uri.parse("https://projectmicroservices-7uy7oyn5ia-uc.a.run.app/deals/$query"),
-        // Uri.parse("http://192.168.0.13:5000/deals/$query"),
         headers: {"Access-Control-Allow-Origin": "*"});
-    // final response = await http
-    //     .get(Uri.parse("https://api.discountapi.com/v2/deals?query=mousepad"));
     if (res.statusCode == 200) {
       List<Deal> retList = [];
-      // title, description, price, value, discount_amount, url, image_url
       List getList = json.decode(res.body);
       for (int i = 0; i < getList.length; i++) {
         retList.add(Deal.fromJson(getList[i]));
-        // print(getList[i]['price']);
       }
-      print(retList[0].price);
-      // print(res.body);
-      // var v = json.decode(res.body);
-      // print(v[0]['title']);
       return retList;
-      // return jsonDecode(response.body);
     } else {
       throw Exception('failed to load');
     }
@@ -194,10 +179,6 @@ class TransactionCard extends StatelessWidget {
                   onPressed: () async {
                     var dealList = await fetchData(transactionItem.itemTitle)
                         as List<Deal>;
-                    // Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //         builder: (_) => DealScreen(dealList: dealList)));
                     Navigator.of(context)
                         .pushNamed('/deals', arguments: {'dealList': dealList, 'item': transactionItem.itemTitle});
                   },
@@ -249,7 +230,6 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                 keyboardType: TextInputType.number,
                 inputFormatters: <TextInputFormatter>[
                   FilteringTextInputFormatter.digitsOnly,
-                  // FilteringTextInputFormatter.allow('.')
                 ],
                 decoration: const InputDecoration(hintText: "Amount in \$"),
               ),

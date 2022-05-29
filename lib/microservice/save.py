@@ -33,7 +33,6 @@ class Deal:
 def Save(savefile, contentFile):
     # Open the files 
     contents = open(contentFile, 'r+')
-    # "C:\Users\Matthew McKelvey\Downloads\Checking_Checking_Transactions_20220513-175611.CSV"
     savefile = open(savefile, 'r+')
     # Hold the save data in a struct 
     deals = []
@@ -68,7 +67,6 @@ def Save(savefile, contentFile):
 
 def Load(savefile, contentsfile):
     # Open the files 
-    # contents = open('./lib/microservice/contents.txt', 'r+')
     # while not os.path.exists('C:/Users/Matthew McKelvey/Downloads/contents.txt'):
     while not os.path.exists(contentsfile):
         time.sleep(1)
